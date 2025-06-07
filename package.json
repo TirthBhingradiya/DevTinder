@@ -1,0 +1,22 @@
+{
+  "name": "devtinder",
+  "version": "1.0.0",
+  "description": "\"dev Tinder project aim to developer through smoothly conversion",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TirthBhingradiya/DevTinder.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TirthBhingradiya/DevTinder/issues"
+  },
+  "homepage": "https://github.com/TirthBhingradiya/DevTinder#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

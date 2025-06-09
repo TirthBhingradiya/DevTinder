@@ -4,28 +4,30 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 const app = express();
 
+app.use(express.json());
 app.post("/signup", async (req, res) => {
-  const user = new User({
-    firstName: "Tirth",
-    lastName: "Bhingradiya",
-    emaild: "abc@gmail.com",
-    password: "tirht1233",
-  });
+  const user = new User(req.body);
+  console.log("user", user);
 
-  await user.save();
+  try {
+    await user.save();
+    res.send("User added successfully");
+  } catch (err) {
+    res.status(400).send("Error facing the user", +err.message);
+  }
   res.send("User added successfully");
 });
 
 connectDB()
   .then(() => {
     console.log("Database connection established");
+    app.listen(3000, () => {
+      console.log("Server started successfully");
+    });
   })
   .catch((err) => {
-    console.error("Database connection losed ");
+    console.error("Database connection failed:", err);
   });
-app.listen(3000, () => {
-  console.log("server started successfully");
-});
 
 // app.use("/home", (req, res) => {
 //   res.send("tested successfully");

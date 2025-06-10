@@ -1,10 +1,11 @@
 const express = require("express");
-const { execArgv } = require("process");
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const app = express();
 
 app.use(express.json());
+
+/// express je apane json objecct ape che ene javascript object ma convert kre che express.json();
 app.post("/signup", async (req, res) => {
   const user = new User(req.body);
   console.log("user", user);
@@ -16,6 +17,27 @@ app.post("/signup", async (req, res) => {
     res.status(400).send("Error facing the user", +err.message);
   }
   res.send("User added successfully");
+});
+
+app.patch("/signup", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    const user = await User.findByIdAndUpdate({ _id: userId }, data);
+    res.send("User updated successfully");
+  } catch (err) {
+    res.status(400).send("Something went wrong");
+  }
+});
+
+app.delete("/signup", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    const user = await User.findByIdAndDelete({ _id: userId });
+    res.send("User deleted successfully");
+  } catch {
+    res.status(400).send("something went wrong");
+  }
 });
 
 connectDB()

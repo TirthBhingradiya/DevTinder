@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { type } = require("os");
+const { validate } = require("webpack");
 
 const userSchema = mongoose.Schema({
   firstName: {
@@ -27,7 +28,15 @@ const userSchema = mongoose.Schema({
   },
   gender: {
     type: String,
+    validate(value){
+      if(!["male","female","others"].includes(value)){
+        throw new Error("Gender data is not valid")
+      }
+    }
   },
+  skills:{
+    type:[String];
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);

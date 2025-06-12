@@ -2,17 +2,22 @@ const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const app = express();
+const { validationSignUpData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
 
 /// express je apane json objecct ape che ene javascript object ma convert kre che express.json();
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body);
-  console.log("user", user);
-
   try {
+    validationSignUpData(req);
+
+    const { password } = req.body;
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = new User(req.body);
+
     await user.save();
-    res.send("User added successfully");
+    res.send("user send successfully");
   } catch (err) {
     res.status(400).send("Error facing the user", +err.message);
   }

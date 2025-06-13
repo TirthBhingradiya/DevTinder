@@ -4,8 +4,44 @@ const User = require("./models/user");
 const app = express();
 const { validationSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+const { userAuth } = require("./middleware/auth");
 
 app.use(express.json());
+app.use(cookieParser());
+
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId: emailId });
+
+    if (!user) {
+      throw new Error("Invalid Credentilas");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (isPasswordValid) {
+      const token = await user.getJWT();
+      res.cookie("token", token);
+      res.send("login successful");
+    } else {
+      throw new Error("Invalid Credentilas yet");
+    }
+  } catch (err) {
+    res.status(400).send("ERROR:" + err.message);
+  }
+});
+
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    console.log("user is", user);
+    res.send(user);
+  } catch (err) {
+    res.status(400).send("ERROR" + err.message);
+  }
+});
 
 /// express je apane json objecct ape che ene javascript object ma convert kre che express.json();
 app.post("/signup", async (req, res) => {
@@ -14,7 +50,10 @@ app.post("/signup", async (req, res) => {
 
     const { password } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = new User(req.body);
+    const user = new User({
+      ...req.body,
+      password: passwordHash,
+    });
 
     await user.save();
     res.send("user send successfully");

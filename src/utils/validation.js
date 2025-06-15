@@ -8,6 +8,26 @@ const validationSignUpData = (req) => {
     throw new Error("FirstName will be 4-50 character");
   } else if (!validator.isEmail(emailId)) {
     throw new Error("email is not valid");
+  } else if (!validator.isSemVer(password)) {
+    throw new Error("Please enter a strong password");
   }
 };
-module.exports = { validationSignUpData };
+
+const validateEditProfileData = (req) => {
+  const allowedEditFields = [
+    "firstName",
+    "lastName",
+    "emailId",
+    "photoUrl",
+    "gender",
+    "age",
+    "about",
+    "skills",
+  ];
+
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    allowedEditFields.includes(field)
+  );
+  return isEditAllowed;
+};
+module.exports = { validationSignUpData, validateEditProfileData };

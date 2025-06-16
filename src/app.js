@@ -11,78 +11,84 @@ const { userAuth } = require("./middleware/auth");
 app.use(express.json());
 app.use(cookieParser());
 
-app.post("/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
-    const user = await User.findOne({ emailId: emailId });
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
 
-    if (!user) {
-      throw new Error("Invalid Credentilas");
-    }
-    const isPasswordValid = await user.validatePassword(password);
+app.use("/", authRouter);
+app.use("/", profileRouter);
 
-    if (isPasswordValid) {
-      const token = await user.getJWT();
-      res.cookie("token", token);
-      res.send("login successful");
-    } else {
-      throw new Error("Invalid Credentilas yet");
-    }
-  } catch (err) {
-    res.status(400).send("ERROR:" + err.message);
-  }
-});
+// app.post("/login", async (req, res) => {
+//   try {
+//     const { emailId, password } = req.body;
+//     const user = await User.findOne({ emailId: emailId });
 
-app.get("/profile", userAuth, async (req, res) => {
-  try {
-    const user = req.user;
-    console.log("user is", user);
-    res.send(user);
-  } catch (err) {
-    res.status(400).send("ERROR" + err.message);
-  }
-});
+//     if (!user) {
+//       throw new Error("Invalid Credentilas");
+//     }
+//     const isPasswordValid = await user.validatePassword(password);
 
-/// express je apane json objecct ape che ene javascript object ma convert kre che express.json();
-app.post("/signup", async (req, res) => {
-  try {
-    validationSignUpData(req);
+//     if (isPasswordValid) {
+//       const token = await user.getJWT();
+//       res.cookie("token", token);
+//       res.send("login successful");
+//     } else {
+//       throw new Error("Invalid Credentilas yet");
+//     }
+//   } catch (err) {
+//     res.status(400).send("ERROR:" + err.message);
+//   }
+// });
 
-    const { password } = req.body;
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = new User({
-      ...req.body,
-      password: passwordHash,
-    });
+// app.get("/profile", userAuth, async (req, res) => {
+//   try {
+//     const user = req.user;
+//     console.log("user is", user);
+//     res.send(user);
+//   } catch (err) {
+//     res.status(400).send("ERROR" + err.message);
+//   }
+// });
 
-    await user.save();
-    res.send("user send successfully");
-  } catch (err) {
-    res.status(400).send("Error facing the user", +err.message);
-  }
-  res.send("User added successfully");
-});
+// /// express je apane json objecct ape che ene javascript object ma convert kre che express.json();
+// app.post("/signup", async (req, res) => {
+//   try {
+//     validationSignUpData(req);
 
-app.patch("/signup", async (req, res) => {
-  const userId = req.body.userId;
-  const data = req.body;
-  try {
-    const user = await User.findByIdAndUpdate({ _id: userId }, data);
-    res.send("User updated successfully");
-  } catch (err) {
-    res.status(400).send("Something went wrong");
-  }
-});
+//     const { password } = req.body;
+//     const passwordHash = await bcrypt.hash(password, 10);
+//     const user = new User({
+//       ...req.body,
+//       password: passwordHash,
+//     });
 
-app.delete("/signup", async (req, res) => {
-  const userId = req.body.userId;
-  try {
-    const user = await User.findByIdAndDelete({ _id: userId });
-    res.send("User deleted successfully");
-  } catch {
-    res.status(400).send("something went wrong");
-  }
-});
+//     await user.save();
+//     res.send("user send successfully");
+//   } catch (err) {
+//     res.status(400).send("Error facing the user", +err.message);
+//   }
+//   res.send("User added successfully");
+// });
+
+// app.patch("/signup", async (req, res) => {
+//   const userId = req.body.userId;
+//   const data = req.body;
+//   try {
+//     const user = await User.findByIdAndUpdate({ _id: userId }, data);
+//     res.send("User updated successfully");
+//   } catch (err) {
+//     res.status(400).send("Something went wrong");
+//   }
+// });
+
+// app.delete("/signup", async (req, res) => {
+//   const userId = req.body.userId;
+//   try {
+//     const user = await User.findByIdAndDelete({ _id: userId });
+//     res.send("User deleted successfully");
+//   } catch {
+//     res.status(400).send("something went wrong");
+//   }
+// });
 
 connectDB()
   .then(() => {
